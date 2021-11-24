@@ -63,12 +63,16 @@ router.post("/api/workouts", (req, res) => {
 // GET /api/workouts/range
 router.get("/api/workouts/range", (req, res) => {
   // console.log("entered GET /api/workouts/range");
-  db.Workout.find({}, (error, data) => {
-    if (error) {
-      res.send(error);
-    } else {
-      res.json(data);
-    }
+  db.Workout.aggregate([
+    {
+      $addFields: {
+        totalDuration: {
+          $sum: "$exercises.duration",
+        },
+      },
+    },
+  ]).then((data) => {
+    res.json(data);
   });
 });
 
